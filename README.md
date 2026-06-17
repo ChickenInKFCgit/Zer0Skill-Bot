@@ -5,7 +5,7 @@ Zer0 est un bot discord, qui a pour utilité de relier différents projets réal
 - AnnoyingText
 - (autres)
 
-Ce projet a une structure modulaire, avec comme entrypoint link:bot/bot.py[bot.py]
+Ce projet a une structure modulaire, avec comme entry point [bot.py](link:bot/bot.py)
 
 Permet d'exécuter plusieurs actions reliées à ces programmes via des commandes, telles que :
 
