@@ -1,5 +1,5 @@
 """
-Permet de définir les intentions du bot.
+Configure les intentions du bot.
 Cela permet de décrire à discord quelles fonctionnalités il utilise et donc quelles permissions demander.
 """
 

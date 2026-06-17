@@ -1,5 +1,5 @@
 """
-Lance le bot discord
+Lance le bot discord. Est l'entry point de Zer0.
 """
 import bot_commands as botc
 
