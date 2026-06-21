@@ -22,13 +22,5 @@ async def test(interaction: discord.Interaction, arg:str):
 
 @bot.event
 async def on_ready():
-    """
-    Tente de syncroniser les descriptions des commandes avec les commandes, et affiche une erreur si échec.
-    Cette fonction s'éxecute automatiquement lorsque le bot se connecte.
-    """
-    try:
-        await bot.tree.sync()
-        print("syncronisation réalisée")
-    except Exception as e:
-        print("Erreur lors de la syncronisation : "+e)
+    await bot.tree.sync()
     
