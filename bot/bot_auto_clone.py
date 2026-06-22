@@ -7,15 +7,18 @@ si module non trouvé : pip install gitpython
 
 from git import Repo 
 
+
+
 def clone_service(servicename:str) -> str:
     """
     Clone un service.
     Renvoie le résultat d'exécution.
     """
+
     if (servicename in d_repos.keys()):
         urlrepo = d_repos[servicename]
-        pathrepo = f"bot\\services\\{servicename}" 
-        
+        pathrepo = f"services/{servicename}"
+
         try: repo = __cloner(git_url=urlrepo, repo_dir=pathrepo)
         except Exception: return f"Echec : '{pathrepo}' existe déjà et n'est pas vide." 
         if(repo==None ):
@@ -38,8 +41,7 @@ def load_repositories():
             nom_repo, url_repo = valeurs[0], valeurs[1]
             d[nom_repo] = url_repo
     return d
+ 
 
-
-
-PATH_REPOSITORIES = "bot/services/repositories.tsv"
+PATH_REPOSITORIES = "services/repositories.tsv"
 d_repos = load_repositories()

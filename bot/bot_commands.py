@@ -4,10 +4,21 @@ Définit toutes les commandes du bot via la fonction load_commands.
 
 # Import des librairies et modules
 import discord
+import os
 from discord.ext import commands
 
 import bot_console_dialog
-import bot_auto_clone
+
+def deplacer_chemin_courant():
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
+async def envoyer_message_en_morceaux(message:str, interaction: discord.Interaction):
+    # Découpe le texte par blocs de 1900 caractères (marge de sécurité)
+    taille_max = 1900
+
+    # Envoie le reste à la suite si le texte était trop long
+    for morceau in [message[i:i + taille_max] for i in range(0, len(message), taille_max)]:
+        await interaction.followup.send(morceau)
 
 def load_commands(bot:commands.bot.Bot):
     """
@@ -38,9 +49,11 @@ def load_commands(bot:commands.bot.Bot):
     @bot.tree.command(name="services_get", description="Pour chaque service introuvable, cloning de ceux-ci.")
     async def services_get(interaction: discord.Interaction):
         texte="Obtention des services non-trouvés :"
+        deplacer_chemin_courant()
         for service in L_services_non_trouves:
             texte +=f"\n\t- {service} : " 
             texte+=bot_auto_clone.clone_service(service)
+
         await interaction.response.send_message(texte)
 
     @bot.tree.command(name="annoying_text", description="Permet de randomiser les lettres du texte fourni.")
@@ -50,6 +63,12 @@ def load_commands(bot:commands.bot.Bot):
         else:
             resultat = SERVICE_INTROUVABLE
         await interaction.response.send_message(resultat)
+
+    @bot.tree.command(name="chest_hunt_simulator_idle_slayer", description="Permet de randomiser les lettres du texte fourni.")
+    async def chest_hunt_simulator_idle_slayer(interaction: discord.Interaction, nombre_generations:int, nombre_simulations:int):
+        await interaction.response.defer(thinking=True) # laisse le temps au bot de réfléchir
+        resultat = simuler(nombre_generations,nombre_simulations)
+        await envoyer_message_en_morceaux(resultat,interaction)
     
     
 
@@ -58,8 +77,16 @@ SERVICE_INTROUVABLE = "Le service est introuvable, essayez  /services_get et de 
 
 #constantes de noms services
 SERVICE_AT = "annoying_text"
+SERVICE_CHSIS = "chest_hunt_simulator_idle_slayer"
+
+# Chargement des repositories
+deplacer_chemin_courant()
+import bot_auto_clone
 
 # Import des services, et si un service est introuvable, il est flag comme non trouvé.
 L_services_non_trouves = []
 try:    from services.annoying_text.annoyingtext import codertexte
 except ModuleNotFoundError: L_services_non_trouves.append(SERVICE_AT)
+
+try:    from services.chest_hunt_simulator_idle_slayer.simu import simuler
+except ModuleNotFoundError: L_services_non_trouves.append(SERVICE_CHSIS)
