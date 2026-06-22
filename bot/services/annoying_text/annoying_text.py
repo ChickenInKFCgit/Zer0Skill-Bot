@@ -14,7 +14,8 @@ texteAcoder="RoRoger"
 
 print(texteAcoder)
 
-def codertexte(texte,d):
+def codertexte(texte):
+	d = Lettres
 	texte,st=list(texte),''
 	for k in range(len(texte)):
 		if texte[k] in d.keys():
