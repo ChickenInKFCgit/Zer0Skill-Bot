@@ -53,11 +53,11 @@ def load_commands(bot:commands.bot.Bot):
             texte="Aucun service non trouvé ✅"
         
         for service in L_services_non_trouves:
-            texte +=f"\n\t- {service}"
+            texte +=f"\n- {service}"
         await interaction.followup.send(texte)
 
-    @bot.tree.command(name="services_get", description="Pour chaque service introuvable, cloning de ceux-ci.")
-    async def services_get(interaction: discord.Interaction):
+    @bot.tree.command(name="services_search", description="Charge chacun des services introuvables depuis github.")
+    async def services_search(interaction: discord.Interaction):
         # laisse le temps au bot de réfléchir
         await interaction.response.defer(thinking=True) 
 
@@ -67,12 +67,12 @@ def load_commands(bot:commands.bot.Bot):
             texte="Aucun service non trouvé, obtention des services annulée."
         deplacer_chemin_courant()
         for service in L_services_non_trouves:
-            texte +=f"\n\t- {service} : " 
+            texte +=f"\n- {service} : " 
             texte+=bot_git.clone_service(service)
 
         await interaction.followup.send(texte)
     
-    @bot.tree.command(name="services_update", description="Pour chaque service, pull de celui-ci (actualisation).")
+    @bot.tree.command(name="services_update", description="Met à jour chacun des services à la version disponible sur github.")
     async def services_update(interaction: discord.Interaction):
         # laisse le temps au bot de réfléchir
         await interaction.response.defer(thinking=True) 
@@ -83,7 +83,7 @@ def load_commands(bot:commands.bot.Bot):
             texte="Aucun service ❌."
         deplacer_chemin_courant()
         for service in L_services:
-            texte +=f"\n\t- {service} : " 
+            texte +=f"\n- {service} : " 
             if service not in L_services_non_trouves:
                 texte+=bot_git.pull_service(service)
             else:
