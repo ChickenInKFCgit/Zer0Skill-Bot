@@ -40,7 +40,7 @@ def load_commands(bot:commands.bot.Bot):
         # laisse le temps au bot de réfléchir
         await interaction.response.defer(thinking=True) 
         
-        await interaction.response.send_message(a_repeter)
+        await interaction.followup.send(a_repeter)
 
     @bot.tree.command(name="services_introuvables", description="Indique tous les services qui n'ont pas pu être lancés.")
     async def services_introuvables(interaction: discord.Interaction):
@@ -54,7 +54,7 @@ def load_commands(bot:commands.bot.Bot):
         
         for service in L_services_non_trouves:
             texte +=f"\n\t- {service}"
-        await interaction.response.send_message(texte)
+        await interaction.followup.send(texte)
 
     @bot.tree.command(name="services_get", description="Pour chaque service introuvable, cloning de ceux-ci.")
     async def services_get(interaction: discord.Interaction):
@@ -64,13 +64,13 @@ def load_commands(bot:commands.bot.Bot):
         if len(L_services_non_trouves) > 0:
             texte="Obtention des services non-trouvés :"
         else :
-            texte="Aucun service non trouvé ✅"
+            texte="Aucun service non trouvé, obtention des services annulée."
         deplacer_chemin_courant()
         for service in L_services_non_trouves:
             texte +=f"\n\t- {service} : " 
             texte+=bot_git.clone_service(service)
 
-        await interaction.response.send_message(texte)
+        await interaction.followup.send(texte)
     
     @bot.tree.command(name="services_update", description="Pour chaque service, pull de celui-ci (actualisation).")
     async def services_update(interaction: discord.Interaction):
@@ -89,7 +89,7 @@ def load_commands(bot:commands.bot.Bot):
             else:
                 texte+=f"Impossible de pull, service {service} introuvable"
 
-        await interaction.response.send_message(texte)
+        await interaction.followup.send(texte)
 
     @bot.tree.command(name="annoying_text", description="Permet de randomiser les lettres du texte fourni.")
     async def annoying_text(interaction: discord.Interaction, texte_a_randomiser:str):
@@ -100,7 +100,7 @@ def load_commands(bot:commands.bot.Bot):
             resultat = codertexte(texte_a_randomiser)
         else:
             resultat = SERVICE_INTROUVABLE
-        await interaction.response.send_message(resultat)
+        await interaction.followup.send(resultat)
 
     @bot.tree.command(name="chest_hunt_simulator_idle_slayer", description="Permet de randomiser les lettres du texte fourni.")
     async def chest_hunt_simulator_idle_slayer(interaction: discord.Interaction, nombre_generations:int, nombre_simulations:int):
