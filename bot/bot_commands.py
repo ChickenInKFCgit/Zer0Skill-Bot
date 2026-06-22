@@ -48,16 +48,18 @@ def load_commands(bot:commands.bot.Bot):
         if SERVICE_AT not in L_services_non_trouves:
             resultat = codertexte(texte_a_randomiser)
         else:
-            resultat = "Le service annoying text est introuvable."
+            resultat = SERVICE_INTROUVABLE
         await interaction.response.send_message(resultat)
     
     
 
-    
+#constantes messsages d'erreur
+SERVICE_INTROUVABLE = "Le service est introuvable, essayez  /services_get et de relancer le bot."
+
 #constantes de noms services
 SERVICE_AT = "annoying_text"
 
 # Import des services, et si un service est introuvable, il est flag comme non trouvé.
 L_services_non_trouves = []
-try:    from services.annoying_text.annoying_text import codertexte
+try:    from services.annoying_text.annoyingtext import codertexte
 except ModuleNotFoundError: L_services_non_trouves.append(SERVICE_AT)

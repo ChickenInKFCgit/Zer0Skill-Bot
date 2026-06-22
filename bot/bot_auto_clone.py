@@ -14,25 +14,32 @@ def clone_service(servicename:str) -> str:
     """
     if (servicename in d_repos.keys()):
         urlrepo = d_repos[servicename]
-        pathrepo = "services"
-        if(__cloner(git_url=urlrepo, repo_dir=pathrepo) ):
+        pathrepo = f"bot\\services\\{servicename}" 
+        
+        try: repo = __cloner(git_url=urlrepo, repo_dir=pathrepo)
+        except Exception: return f"Echec : '{pathrepo}' existe déjà et n'est pas vide." 
+        if(repo==None ):
+            return f"Echec du cloning du repository : '{urlrepo}' dans '{pathrepo}'." 
+        else:
             return f"Réussite du cloning du repository à l'adresse '{urlrepo}' dans '{pathrepo}'."
-        else :
-            return f"Echec du cloning du repository : '{urlrepo}' dans '{pathrepo}'."
     else:
         return f"'{servicename}' ne correspond à aucun repo enregistré dans 'repositories.tsv'."
 
-def __cloner(git_url:str, repo_dir:str) -> bool:
-    rep = Repo.clone_from(git_url, repo_dir)
-    return rep != None
+def __cloner(git_url:str, repo_dir:str) -> Repo:
+    return Repo.clone_from(git_url, repo_dir) 
 
 def load_repositories():
-    f = open("services/repositories.tsv",mode="r",encoding="utf-8")
+    f = open(PATH_REPOSITORIES,mode="r",encoding="utf-8")
 
     d={}
     for ligne in f.read().split("\n"):
-        nom_repo, url_repo = ligne.split("\t");
-        d[nom_repo] = url_repo
+        if ligne!='':
+            valeurs = ligne.split("\t");
+            nom_repo, url_repo = valeurs[0], valeurs[1]
+            d[nom_repo] = url_repo
     return d
 
+
+
+PATH_REPOSITORIES = "bot/services/repositories.tsv"
 d_repos = load_repositories()
