@@ -9,9 +9,9 @@ import bot_console_dialog
 
 
 # Import des services, et si un service est introuvable, il est flag comme non trouvé.
-services_non_trouves = []
+L_services_non_trouves = []
 try:    from services.annoying_text.annoying_text import codertexte
-except ModuleNotFoundError: services_non_trouves.append("annoying_text")
+except ModuleNotFoundError: L_services_non_trouves.append("annoying_text")
 
 def load_commands(bot:commands.bot.Bot):
     """
@@ -35,13 +35,16 @@ def load_commands(bot:commands.bot.Bot):
     @bot.tree.command(name="services_introuvables", description="Indique tous les services qui n'ont pas pu être lancés.")
     async def services_introuvables(interaction: discord.Interaction):
         texte="Services qui n'ont pas pu être lancés : "
-        for service in services_non_trouves:
+        for service in L_services_non_trouves:
             texte +=f"\n\t- {service}"
-        await interaction.response.send_message("")
+        await interaction.response.send_message(texte)
 
     @bot.tree.command(name="annoying_text", description="Permet de randomiser les lettres du texte fourni.")
     async def annoying_text(interaction: discord.Interaction, texte_a_randomiser:str):
-        resultat = codertexte(texte_a_randomiser)
+        if "annoying_text" not in L_services_non_trouves:
+            resultat = codertexte(texte_a_randomiser)
+        else:
+            resultat = "Le service annoying text est introuvable."
         await interaction.response.send_message(resultat)
     
     
