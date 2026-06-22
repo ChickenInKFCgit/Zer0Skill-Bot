@@ -2,12 +2,16 @@
 Définit toutes les commandes du bot via la fonction load_commands.
 """
 
+# Import des librairies et modules
 import discord
 from discord.ext import commands
-
 import bot_console_dialog
 
-from services.annoying_text.annoying_text import codertexte
+
+# Import des services, et si un service est introuvable, il est flag comme non trouvé.
+services_non_trouves = []
+try:    from services.annoying_text.annoying_text import codertexte
+except ModuleNotFoundError: services_non_trouves.append("annoying_text")
 
 def load_commands(bot:commands.bot.Bot):
     """
@@ -28,9 +32,18 @@ def load_commands(bot:commands.bot.Bot):
     async def repete(interaction: discord.Interaction, a_repeter:str):
         await interaction.response.send_message(a_repeter)
 
+    @bot.tree.command(name="services_introuvables", description="Indique tous les services qui n'ont pas pu être lancés.")
+    async def services_introuvables(interaction: discord.Interaction):
+        texte="Services qui n'ont pas pu être lancés : "
+        for service in services_non_trouves:
+            texte +=f"\n\t- {service}"
+        await interaction.response.send_message("")
+
     @bot.tree.command(name="annoying_text", description="Permet de randomiser les lettres du texte fourni.")
     async def annoying_text(interaction: discord.Interaction, texte_a_randomiser:str):
         resultat = codertexte(texte_a_randomiser)
         await interaction.response.send_message(resultat)
+    
+    
 
     
