@@ -29,9 +29,16 @@ def clone_service(servicename:str) -> str:
         return f"'{servicename}' ne correspond à aucun repo enregistré dans 'repositories.tsv'."
 
 def pull_service(servicename:str):
+    """
+    Pull un service.
+    Renvoie le résultat d'exécution
+    """
     pathrepo = f"services/{servicename}"
-    repo = Repo(pathrepo)
-    __pull(repo)
+    try: repo = Repo(pathrepo)
+    except Exception: return f"Echec de l'accès au repository {servicename}, au chemin {pathrepo}"
+    try: __pull(repo)
+    except Exception: return f"Echec du pull du repository dans {servicename}.[{type(e)}]"
+    return f"Réussite du pull du repository dans '{pathrepo}'."
 
 def __pull(repo:Repo):
     repo.remotes.origin.pull()

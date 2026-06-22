@@ -13,6 +13,9 @@ def deplacer_chemin_courant():
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 async def envoyer_message_en_morceaux(message:str, interaction: discord.Interaction):
+    # laisse le temps au bot de réfléchir
+    await interaction.response.defer(thinking=True) 
+
     # Découpe le texte par blocs de 1900 caractères (marge de sécurité)
     taille_max = 1900
 
@@ -55,6 +58,19 @@ def load_commands(bot:commands.bot.Bot):
             texte+=bot_git.clone_service(service)
 
         await interaction.response.send_message(texte)
+    
+    @bot.tree.command(name="services_update", description="Pour chaque service, pull de celui-ci (actualisation).")
+    async def services_update(interaction: discord.Interaction):
+        texte="Actualisation des services :"
+        deplacer_chemin_courant()
+        for service in L_services:
+            texte +=f"\n\t- {service} : " 
+            if service not in L_services_non_trouves:
+                texte+=bot_git.pull_service(service)
+            else:
+                texte+=f"Impossible de pull, service {service} introuvable"
+
+        await interaction.response.send_message(texte)
 
     @bot.tree.command(name="annoying_text", description="Permet de randomiser les lettres du texte fourni.")
     async def annoying_text(interaction: discord.Interaction, texte_a_randomiser:str):
@@ -66,7 +82,6 @@ def load_commands(bot:commands.bot.Bot):
 
     @bot.tree.command(name="chest_hunt_simulator_idle_slayer", description="Permet de randomiser les lettres du texte fourni.")
     async def chest_hunt_simulator_idle_slayer(interaction: discord.Interaction, nombre_generations:int, nombre_simulations:int):
-        await interaction.response.defer(thinking=True) # laisse le temps au bot de réfléchir
         resultat = simuler(nombre_generations,nombre_simulations)
         await envoyer_message_en_morceaux(resultat,interaction)
     
@@ -84,6 +99,7 @@ deplacer_chemin_courant()
 import bot.bot_git as bot_git
 
 # Import des services, et si un service est introuvable, il est flag comme non trouvé.
+L_services = [SERVICE_AT,SERVICE_CHSIS]
 L_services_non_trouves = []
 try:    from services.annoying_text.annoyingtext import codertexte
 except ModuleNotFoundError: L_services_non_trouves.append(SERVICE_AT)
