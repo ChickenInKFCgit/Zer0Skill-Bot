@@ -21,5 +21,6 @@ import bot_commands as botc
 botc.load_commands(client)
 
 # Chargement du bot
+bot_console_dialog.confirm("Client lancé.")
 client.run(token=TOKEN)
 bot_console_dialog.confirm("Client arrêté.")
