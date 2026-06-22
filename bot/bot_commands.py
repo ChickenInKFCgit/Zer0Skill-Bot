@@ -12,10 +12,7 @@ import bot_console_dialog
 def deplacer_chemin_courant():
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-async def envoyer_message_en_morceaux(message:str, interaction: discord.Interaction):
-    # laisse le temps au bot de réfléchir
-    await interaction.response.defer(thinking=True) 
-
+async def envoyer_message_en_morceaux(message:str, interaction: discord.Interaction): 
     # Découpe le texte par blocs de 1900 caractères (marge de sécurité)
     taille_max = 1900
 
@@ -40,18 +37,34 @@ def load_commands(bot:commands.bot.Bot):
     #___COMMANDES
     @bot.tree.command(name="repete", description="Une commande de test qui répète ton message")
     async def repete(interaction: discord.Interaction, a_repeter:str):
+        # laisse le temps au bot de réfléchir
+        await interaction.response.defer(thinking=True) 
+        
         await interaction.response.send_message(a_repeter)
 
     @bot.tree.command(name="services_introuvables", description="Indique tous les services qui n'ont pas pu être lancés.")
     async def services_introuvables(interaction: discord.Interaction):
-        texte="Services qui n'ont pas pu être lancés : "
+        # laisse le temps au bot de réfléchir
+        await interaction.response.defer(thinking=True) 
+        
+        if len(L_services_non_trouves) > 0:
+            texte="Services qui n'ont pas pu être lancés : "
+        else :
+            texte="Aucun service non trouvé ✅"
+        
         for service in L_services_non_trouves:
             texte +=f"\n\t- {service}"
         await interaction.response.send_message(texte)
 
     @bot.tree.command(name="services_get", description="Pour chaque service introuvable, cloning de ceux-ci.")
     async def services_get(interaction: discord.Interaction):
-        texte="Obtention des services non-trouvés :"
+        # laisse le temps au bot de réfléchir
+        await interaction.response.defer(thinking=True) 
+
+        if len(L_services_non_trouves) > 0:
+            texte="Obtention des services non-trouvés :"
+        else :
+            texte="Aucun service non trouvé ✅"
         deplacer_chemin_courant()
         for service in L_services_non_trouves:
             texte +=f"\n\t- {service} : " 
@@ -61,7 +74,13 @@ def load_commands(bot:commands.bot.Bot):
     
     @bot.tree.command(name="services_update", description="Pour chaque service, pull de celui-ci (actualisation).")
     async def services_update(interaction: discord.Interaction):
-        texte="Actualisation des services :"
+        # laisse le temps au bot de réfléchir
+        await interaction.response.defer(thinking=True) 
+        
+        if len(L_services) > 0:
+            texte="Actualisation des services :"
+        else:
+            texte="Aucun service ❌."
         deplacer_chemin_courant()
         for service in L_services:
             texte +=f"\n\t- {service} : " 
@@ -74,6 +93,9 @@ def load_commands(bot:commands.bot.Bot):
 
     @bot.tree.command(name="annoying_text", description="Permet de randomiser les lettres du texte fourni.")
     async def annoying_text(interaction: discord.Interaction, texte_a_randomiser:str):
+        # laisse le temps au bot de réfléchir
+        await interaction.response.defer(thinking=True) 
+
         if SERVICE_AT not in L_services_non_trouves:
             resultat = codertexte(texte_a_randomiser)
         else:
@@ -82,6 +104,9 @@ def load_commands(bot:commands.bot.Bot):
 
     @bot.tree.command(name="chest_hunt_simulator_idle_slayer", description="Permet de randomiser les lettres du texte fourni.")
     async def chest_hunt_simulator_idle_slayer(interaction: discord.Interaction, nombre_generations:int, nombre_simulations:int):
+        # laisse le temps au bot de réfléchir
+        await interaction.response.defer(thinking=True) 
+        
         resultat = simuler(nombre_generations,nombre_simulations)
         await envoyer_message_en_morceaux(resultat,interaction)
     
@@ -96,7 +121,7 @@ SERVICE_CHSIS = "chest_hunt_simulator_idle_slayer"
 
 # Chargement des repositories
 deplacer_chemin_courant()
-import bot.bot_git as bot_git
+import bot_git as bot_git
 
 # Import des services, et si un service est introuvable, il est flag comme non trouvé.
 L_services = [SERVICE_AT,SERVICE_CHSIS]
