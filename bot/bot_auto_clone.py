@@ -7,17 +7,20 @@ si module non trouvé : pip install gitpython
 
 from git import Repo 
 
-def clone_service(servicename:str) -> bool:
+def clone_service(servicename:str) -> str:
     """
     Clone un service.
-    Renvoie False si échec du clone du repo ou si repo introuvable dans repositories.tsv, True si tout a fonctionné.
+    Renvoie le résultat d'exécution.
     """
     if (servicename in d_repos.keys()):
         urlrepo = d_repos[servicename]
         pathrepo = "services"
-        return __cloner(git_url=urlrepo, repo_dir=pathrepo)
+        if(__cloner(git_url=urlrepo, repo_dir=pathrepo) ):
+            return f"Réussite du cloning du repository à l'adresse '{urlrepo}' dans '{pathrepo}'."
+        else :
+            return f"Echec du cloning du repository : '{urlrepo}' dans '{pathrepo}'."
     else:
-        return False
+        return f"'{servicename}' ne correspond à aucun repo enregistré dans 'repositories.tsv'."
 
 def __cloner(git_url:str, repo_dir:str) -> bool:
     rep = Repo.clone_from(git_url, repo_dir)

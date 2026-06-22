@@ -5,13 +5,9 @@ Définit toutes les commandes du bot via la fonction load_commands.
 # Import des librairies et modules
 import discord
 from discord.ext import commands
+
 import bot_console_dialog
-
-
-# Import des services, et si un service est introuvable, il est flag comme non trouvé.
-L_services_non_trouves = []
-try:    from services.annoying_text.annoying_text import codertexte
-except ModuleNotFoundError: L_services_non_trouves.append("annoying_text")
+import bot_auto_clone
 
 def load_commands(bot:commands.bot.Bot):
     """
@@ -39,9 +35,17 @@ def load_commands(bot:commands.bot.Bot):
             texte +=f"\n\t- {service}"
         await interaction.response.send_message(texte)
 
+    @bot.tree.command(name="services_get", description="Pour chaque service introuvable, cloning de ceux-ci.")
+    async def services_get(interaction: discord.Interaction):
+        texte="Obtention des services non-trouvés :"
+        for service in L_services_non_trouves:
+            texte +=f"\n\t- {service} : " 
+            texte+=bot_auto_clone.clone_service(service)
+        await interaction.response.send_message(texte)
+
     @bot.tree.command(name="annoying_text", description="Permet de randomiser les lettres du texte fourni.")
     async def annoying_text(interaction: discord.Interaction, texte_a_randomiser:str):
-        if "annoying_text" not in L_services_non_trouves:
+        if SERVICE_AT not in L_services_non_trouves:
             resultat = codertexte(texte_a_randomiser)
         else:
             resultat = "Le service annoying text est introuvable."
@@ -50,3 +54,10 @@ def load_commands(bot:commands.bot.Bot):
     
 
     
+#constantes de noms services
+SERVICE_AT = "annoying_text"
+
+# Import des services, et si un service est introuvable, il est flag comme non trouvé.
+L_services_non_trouves = []
+try:    from services.annoying_text.annoying_text import codertexte
+except ModuleNotFoundError: L_services_non_trouves.append(SERVICE_AT)
