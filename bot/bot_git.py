@@ -28,6 +28,14 @@ def clone_service(servicename:str) -> str:
     else:
         return f"'{servicename}' ne correspond à aucun repo enregistré dans 'repositories.tsv'."
 
+def pull_service(servicename:str):
+    pathrepo = f"services/{servicename}"
+    repo = Repo(pathrepo)
+    __pull(repo)
+
+def __pull(repo:Repo):
+    repo.remotes.origin.pull()
+
 def __cloner(git_url:str, repo_dir:str) -> Repo:
     return Repo.clone_from(git_url, repo_dir) 
 

@@ -52,7 +52,7 @@ def load_commands(bot:commands.bot.Bot):
         deplacer_chemin_courant()
         for service in L_services_non_trouves:
             texte +=f"\n\t- {service} : " 
-            texte+=bot_auto_clone.clone_service(service)
+            texte+=bot_git.clone_service(service)
 
         await interaction.response.send_message(texte)
 
@@ -81,7 +81,7 @@ SERVICE_CHSIS = "chest_hunt_simulator_idle_slayer"
 
 # Chargement des repositories
 deplacer_chemin_courant()
-import bot_auto_clone
+import bot.bot_git as bot_git
 
 # Import des services, et si un service est introuvable, il est flag comme non trouvé.
 L_services_non_trouves = []
