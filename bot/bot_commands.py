@@ -1,9 +1,13 @@
 """
 Définit toutes les commandes du bot via la fonction load_commands.
 """
+
 import discord
 from discord.ext import commands
+
 import bot_console_dialog
+
+from services.annoying_text.annoying_text import codertexte
 
 def load_commands(bot:commands.bot.Bot):
     """
@@ -26,6 +30,7 @@ def load_commands(bot:commands.bot.Bot):
 
     @bot.tree.command(name="annoying_text", description="Permet de randomiser les lettres du texte fourni.")
     async def annoying_text(interaction: discord.Interaction, texte_a_randomiser:str):
-        await interaction.response.send_message(texte_a_randomiser)
+        resultat = codertexte(texte_a_randomiser)
+        await interaction.response.send_message(resultat)
 
     
