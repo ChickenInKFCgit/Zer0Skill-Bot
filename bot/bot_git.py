@@ -20,13 +20,13 @@ def clone_service(servicename:str) -> str:
         pathrepo = f"services/{servicename}"
 
         try: repo = __cloner(git_url=urlrepo, repo_dir=pathrepo)
-        except Exception: return f"Echec : '{pathrepo}' existe déjà et n'est pas vide." 
+        except Exception: return f"❌ Echec : '{pathrepo}' existe déjà et n'est pas vide." 
         if(repo==None ):
-            return f"Echec du cloning du repository : '{urlrepo}' dans '{pathrepo}'." 
+            return f"❌ Echec du cloning du repository : '{urlrepo}' dans '{pathrepo}'." 
         else:
-            return f"Réussite du cloning du repository à l'adresse '{urlrepo}' dans '{pathrepo}'."
+            return f"✅ Réussite du cloning du repository à l'adresse '{urlrepo}' dans '{pathrepo}'."
     else:
-        return f"'{servicename}' ne correspond à aucun repo enregistré dans 'repositories.tsv'."
+        return f"'❌ {servicename}' ne correspond à aucun repo enregistré dans 'repositories.tsv'."
 
 def pull_service(servicename:str):
     """
@@ -35,10 +35,10 @@ def pull_service(servicename:str):
     """
     pathrepo = f"services/{servicename}"
     try: repo = Repo(pathrepo)
-    except Exception: return f"Echec de l'accès au repository {servicename}, au chemin {pathrepo}"
+    except Exception: return f"❌ Echec de l'accès au repository {servicename}, au chemin {pathrepo}"
     try: __pull(repo)
-    except Exception: return f"Echec du pull du repository dans {servicename}.[{type(e)}]"
-    return f"Réussite du pull du repository dans '{pathrepo}'."
+    except Exception as e: return f"❌ Echec du pull du repository dans {servicename}.[{type(e)}] : ```{e}```"
+    return f"✅ Réussite du pull du repository dans '{pathrepo}'."
 
 def __pull(repo:Repo):
     repo.remotes.origin.pull()

@@ -4,6 +4,7 @@ Définit toutes les commandes du bot via la fonction load_commands.
 
 # Import des librairies et modules
 import discord
+import sys
 import os
 from discord.ext import commands
 
@@ -13,10 +14,11 @@ def deplacer_chemin_courant():
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 async def envoyer_message_en_morceaux(message:str, interaction: discord.Interaction): 
-    # Découpe le texte par blocs de 1900 caractères (marge de sécurité)
-    taille_max = 1900
+    """
+    Découpe un message bien trop long en petits messages afin de permettre l'envoi.
+    """ 
+    taille_max = 1900 
 
-    # Envoie le reste à la suite si le texte était trop long
     for morceau in [message[i:i + taille_max] for i in range(0, len(message), taille_max)]:
         await interaction.followup.send(morceau)
 
@@ -35,12 +37,32 @@ def load_commands(bot:commands.bot.Bot):
         
 
     #___COMMANDES
-    @bot.tree.command(name="repete", description="Une commande de test qui répète ton message")
-    async def repete(interaction: discord.Interaction, a_repeter:str):
-        # laisse le temps au bot de réfléchir
-        await interaction.response.defer(thinking=True) 
+    @bot.tree.command(name="restart", description="Redémarre le bot.")
+    async def restart(interaction: discord.Interaction):
+        """
+        Permet de rédémarrer le bot.
+        """
+        # laisse le temps au bot de réfléchir, mais on indique que ça ne doit pas durer longtemps
+        await interaction.response.send_message("Okay le goat, je redémarre pour toi <3", ephemeral=True)
+
+        # 1. On ferme proprement la connexion Discord
+        await bot.close()
         
-        await interaction.followup.send(a_repeter)
+        from pathlib import Path
+        import subprocess
+        import os
+        
+        # 2. On calcule la racine absolue du projet
+        racine_projet = Path(__file__).resolve().parent.parent
+        
+        python_env = str(racine_projet / ".env" / "Scripts" / "python.exe")
+        script_bot = str(racine_projet / "bot" / "bot.py")
+        
+        # On relance le bot en forçant sont répertoire de travail
+        subprocess.Popen([python_env, script_bot], cwd=str(racine_projet))
+        
+        # 4. On tue INSTANTANÉMENT le processus actuel pour laisser la place au nouveau
+        os._exit(0)
 
     @bot.tree.command(name="services_introuvables", description="Indique tous les services qui n'ont pas pu être lancés.")
     async def services_introuvables(interaction: discord.Interaction):
@@ -50,21 +72,21 @@ def load_commands(bot:commands.bot.Bot):
         if len(L_services_non_trouves) > 0:
             texte="Services qui n'ont pas pu être lancés : "
         else :
-            texte="Aucun service non trouvé ✅"
+            texte="✅ Aucun service  introuvable."
         
         for service in L_services_non_trouves:
             texte +=f"\n- {service}"
         await interaction.followup.send(texte)
 
-    @bot.tree.command(name="services_search", description="Charge chacun des services introuvables depuis github.")
-    async def services_search(interaction: discord.Interaction):
+    @bot.tree.command(name="services_obtain", description="Charge chacun des services introuvables depuis github.")
+    async def services_obtain(interaction: discord.Interaction):
         # laisse le temps au bot de réfléchir
         await interaction.response.defer(thinking=True) 
 
         if len(L_services_non_trouves) > 0:
             texte="Obtention des services non-trouvés :"
         else :
-            texte="Aucun service non trouvé, obtention des services annulée."
+            texte="✅ Aucun service non trouvé, obtention des services annulée."
         deplacer_chemin_courant()
         for service in L_services_non_trouves:
             texte +=f"\n- {service} : " 
@@ -80,7 +102,7 @@ def load_commands(bot:commands.bot.Bot):
         if len(L_services) > 0:
             texte="Actualisation des services :"
         else:
-            texte="Aucun service ❌."
+            texte="❌ Aucun service, impossible d'en actualiser."
         deplacer_chemin_courant()
         for service in L_services:
             texte +=f"\n- {service} : " 
@@ -113,7 +135,7 @@ def load_commands(bot:commands.bot.Bot):
     
 
 #constantes messsages d'erreur
-SERVICE_INTROUVABLE = "Le service est introuvable, essayez  /services_get et de relancer le bot."
+SERVICE_INTROUVABLE = "❌ Le service est introuvable, essayez /services_obtain et de relancer le bot."
 
 #constantes de noms services
 SERVICE_AT = "annoying_text"
