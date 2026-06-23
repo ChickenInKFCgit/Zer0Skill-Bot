@@ -138,7 +138,13 @@ def load_commands(bot:commands.bot.Bot):
         # laisse le temps au bot de réfléchir
         await interaction.response.defer(thinking=True) 
         
-        resultat = simuler(nombre_generations,nombre_simulations)
+        if SERVICE_CHSIS not in L_services_non_trouves:
+            resultat = simuler(nombre_generations,nombre_simulations)
+        else:
+            resultat = SERVICE_INTROUVABLE
+        await interaction.followup.send(resultat)
+
+        
         await envoyer_message_en_morceaux(resultat,interaction)
     
     
