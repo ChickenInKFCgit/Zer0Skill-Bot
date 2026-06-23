@@ -3,24 +3,11 @@ Définit toutes les commandes du bot via la fonction load_commands.
 """
 
 # Import des librairies et modules
-import discord
-import sys
-import os
+import discord 
 from discord.ext import commands
 
+
 import bot_console_dialog
-
-def deplacer_chemin_courant():
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
-
-async def envoyer_message_en_morceaux(message:str, interaction: discord.Interaction): 
-    """
-    Découpe un message bien trop long en petits messages afin de permettre l'envoi.
-    """ 
-    taille_max = 1900 
-
-    for morceau in [message[i:i + taille_max] for i in range(0, len(message), taille_max)]:
-        await interaction.followup.send(morceau)
 
 def load_commands(bot:commands.bot.Bot):
     """
@@ -41,86 +28,39 @@ def load_commands(bot:commands.bot.Bot):
     async def restart(interaction: discord.Interaction):
         """
         Permet de rédémarrer le bot.
-        """
-        # laisse le temps au bot de réfléchir, mais on indique que ça ne doit pas durer longtemps
+        """  
         await interaction.response.send_message("Okay le goat, je redémarre pour toi <3", ephemeral=True)
 
-        # 1. On ferme proprement la connexion Discord
-        await bot.close()
+        await commands.restart(bot)
         
-        from pathlib import Path
-        import subprocess
-        import os
-        
-        # 2. On calcule la racine absolue du projet
-        racine_projet = Path(__file__).resolve().parent.parent
-        
-        python_env = str(racine_projet / ".env" / "Scripts" / "python.exe")
-        script_bot = str(racine_projet / "bot" / "bot.py")
-        
-        # On relance le bot en forçant sont répertoire de travail
-        subprocess.Popen([python_env, script_bot], cwd=str(racine_projet))
-        
-        # 4. On tue INSTANTANÉMENT le processus actuel pour laisser la place au nouveau
-        os._exit(0)
 
     @bot.tree.command(name="services_introuvables", description="Indique tous les services qui n'ont pas pu être lancés.")
     async def services_introuvables(interaction: discord.Interaction):
         # laisse le temps au bot de réfléchir
         await interaction.response.defer(thinking=True) 
         
-        if len(L_services_non_trouves) > 0:
-            texte="Services qui n'ont pas pu être lancés : "
-        else :
-            texte="✅ Aucun service  introuvable."
-        
-        for service in L_services_non_trouves:
-            texte +=f"\n- {service}"
-        await interaction.followup.send(texte)
+        await interaction.followup.send( commands.services_introuvables() )
 
     @bot.tree.command(name="services_obtain", description="Charge chacun des services introuvables depuis github.")
     async def services_obtain(interaction: discord.Interaction):
         # laisse le temps au bot de réfléchir
         await interaction.response.defer(thinking=True) 
 
-        if len(L_services_non_trouves) > 0:
-            texte="Obtention des services non-trouvés :"
-        else :
-            texte="✅ Aucun service non trouvé, obtention des services annulée."
-        deplacer_chemin_courant()
-        for service in L_services_non_trouves:
-            texte +=f"\n- {service} : " 
-            texte+=bot_git.clone_service(service)
-
-        await interaction.followup.send(texte)
+        await interaction.followup.send( commands.services_obtain(L_services_non_trouves) )
     
     @bot.tree.command(name="services_update", description="Met à jour chacun des services à la version disponible sur github.")
     async def services_update(interaction: discord.Interaction):
         # laisse le temps au bot de réfléchir
         await interaction.response.defer(thinking=True) 
-        
-        if len(L_services) > 0:
-            texte="Actualisation des services :"
-        else:
-            texte="❌ Aucun service, impossible d'en actualiser."
-        deplacer_chemin_courant()
-        for service in L_services:
-            texte +=f"\n- {service} : " 
-            if service not in L_services_non_trouves:
-                texte+=bot_git.pull_service(service)
-            else:
-                texte+=f"Impossible de pull, service {service} introuvable"
 
-        await interaction.followup.send(texte)
+        await interaction.followup.send( commands.services_update(L_services, L_services_non_trouves))
 
     @bot.tree.command(name="services_force", description="/service_obtain → /service_update → /restart")
     async def services_force(interaction: discord.Interaction):
         # laisse le temps au bot de réfléchir
-        await interaction.response.defer(thinking=True) 
+        await interaction.response.defer(thinking=True)
 
-        await services_obtain(interaction)
-        await services_update(interaction)
-        await restart(interaction)
+        await interaction.followup.send( "Obtention, actualisation des services et redémarrage.")
 
     @bot.tree.command(name="annoying_text", description="Permet de randomiser les lettres du texte fourni.")
     async def annoying_text(interaction: discord.Interaction, texte_a_randomiser:str):
@@ -145,7 +85,7 @@ def load_commands(bot:commands.bot.Bot):
         await interaction.followup.send(resultat)
 
         
-        await envoyer_message_en_morceaux(resultat,interaction)
+        await commands.envoyer_message_en_morceaux(resultat,interaction)
     
     
 
@@ -156,9 +96,8 @@ SERVICE_INTROUVABLE = "❌ Le service est introuvable, essayez /services_obtain 
 SERVICE_AT = "annoying_text"
 SERVICE_CHSIS = "chest_hunt_simulator_idle_slayer"
 
-# Chargement des repositories
-deplacer_chemin_courant()
-import bot_git as bot_git
+# Commandes
+import commands
 
 # Import des services, et si un service est introuvable, il est flag comme non trouvé.
 L_services = [SERVICE_AT,SERVICE_CHSIS]
